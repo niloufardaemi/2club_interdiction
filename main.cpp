@@ -272,6 +272,12 @@ int main(int argc, char *argv[])
 		}
 		theta[0].set(GRB_DoubleAttr_Obj, 1);
 
+		GRBLinExpr hard_constr = GRBLinExpr();
+		/*for (int p1 = 0; p1 < grph.n; ++p1)
+		{
+			hard_constr += X_Master[p1];
+		}*/
+		//model_Master.addConstr(hard_constr <= 10);
 		// add constr for 20% of the vertices
 		GRBLinExpr neighbors_of_v = GRBLinExpr();
 		long v2;
@@ -324,6 +330,9 @@ int main(int argc, char *argv[])
 		//Set objective to minimize
 		model_Master.set(GRB_IntAttr_ModelSense, 1);
 
+		// Save log file
+	//	model_Master.set(GRB_StringParam_LogFile,"geneControl0.93");
+
 		model_Master.update();
 
 		// set callback
@@ -341,19 +350,29 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-
+			
+			int status = model_Master.get(GRB_IntAttr_Status);
+		//	cout << "Status = " << status << endl;
 			double obj_master = model_Master.get(GRB_DoubleAttr_ObjVal);
 			cout << "obj = " << obj_master << endl;
+			
+			vector<long>vec_of_interdicted_vertices;
 			for (int i = 0; i < grph.n; i++)
 			{
 				if (X_Master[i].get(GRB_DoubleAttr_X) > 0.5)
 				{
+					vec_of_interdicted_vertices.push_back(i);
 					num_interdicted_vertices++;
 				}
 			}
 			cout << "num_interdicted_vertices : " << num_interdicted_vertices << endl;
 			cout << "theta : " << theta[0].get(GRB_DoubleAttr_X) << endl;
-			cout << endl;
+	/*		cout << endl << "interdicted vertices:" << endl;
+			for (int i = 0; i < vec_of_interdicted_vertices.size(); i++)
+				{
+					cout<< vec_of_interdicted_vertices[i]<<", ";
+				}
+			cout << endl;*/
 			cout << "*****************************" << endl;
 			cout << "# B&B nodes in interdiction = " << num_BB_Nodes << endl;
 			cout << "# of callbacks in interdiction  = " << num_callbacks_interdiction << endl;
