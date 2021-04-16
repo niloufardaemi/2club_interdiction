@@ -54,7 +54,6 @@ public:
 	bool WriteGVizGraph(string outfile);
 	void WriteSNAPGraph(string outfile);
 	void WriteDIMACSGraph(string outfile);
-
 	/* General purpose utility functions */
 	bool CheckValid();
 	void Duplicate(const KGraph &rhs);
