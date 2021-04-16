@@ -160,8 +160,6 @@ vector<long> KGraph::MultiSourceShortestPaths(vector<long> &D, vector<bool> &S)
 	}
 	return dist;
 }
-
-
 long KGraph::LongestShortestPathUnweighted(long origin)
 {
 	vector<long> SP = ShortestPathsUnweighted(origin);
@@ -661,7 +659,6 @@ vector<long> KGraph::FindDegeneracyOrdering(vector<long> &rightdegree)
 	//cerr << "\n Degeneracy = " << degeneracy << endl;
 	return vert;
 }
-
 vector<long> KGraph::FindDegeneracyOrdering()
 {
 	vector<long> rightdegree;
