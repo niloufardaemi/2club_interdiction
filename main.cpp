@@ -26,7 +26,7 @@ long num_callbacks_interdiction;
 long num_Lazycuts_interdiction_1;
 long num_Lazycuts_interdiction_2;
 long num_Lazycuts_interdiction_3;
-double KclubTime = 0;
+double SclubTime = 0;
 
 
 
@@ -92,7 +92,7 @@ protected:
 					kclb_index = ICUT(induced_g, S_in_Sclb, HS);
 
 					chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_sclub;
-					KclubTime += duration_sclb.count();
+					SclubTime += duration_sclb.count();
 
 
 					vector<long> kclb_original_index;
@@ -100,9 +100,7 @@ protected:
 					{
 						kclb_original_index.push_back(non_interdicted_vertices[kclb_index[i]]);
 					}
-					KGraph induced_kclb = graph_1.CreateInducedGraph(kclb_original_index, ReverseMap);
-
-
+					KGraph induced_kclb = graph_1.CreateInducedGraph(kclb_original_index, ReverseMap);			
 					if (THETA < kclb_index.size())
 					{
 						for (long i = 0; i < kclb_index.size(); i++)
@@ -134,6 +132,7 @@ protected:
 										Star += Xvar[non_interdicted_vertices[kclb_index[j]]];
 									}
 									Star -= Xvar[non_interdicted_vertices[kclb_index[i]]];
+									//addLazy(Theta >= kclb_index.size() -  ((kclb_index.size() - 1) * Xvar[non_interdicted_vertices[kclb_index[i]]]) - Star);
 									addLazy(Theta >= (1 - Xvar[non_interdicted_vertices[kclb_index[i]]]) * (kclb_index.size()) - Star);
 									num_Lazycuts_interdiction_1++;
 									Star = 0;
@@ -144,6 +143,7 @@ protected:
 						if (leaf == true && lazycut_added == false)
 						{
 							cut_in_master = 0;
+							//addLazy(Theta >= kclb_index.size() - ((kclb_index.size() - 1) * Critical_vertices)  - Leaves);
 							addLazy(Theta >= (1 - Critical_vertices) * (kclb_index.size()) - Leaves);
 							num_Lazycuts_interdiction_2++;
 							Leaves = 0;
@@ -246,7 +246,16 @@ int main(int argc, char *argv[])
 			{
 				neighbors_of_v += X_Master[grph.adj[v2][v3]];
 			}
-
+			//////////////////////////////
+			/*if (grph.degree[v2] >= 1)
+			{
+				model_Master.addConstr(theta >= grph.degree[v2] + 1 - (grph.degree[v2] * X_Master[v2]) - neighbors_of_v);
+			}
+			if (grph.degree[v2] == 0)
+			{
+				model_Master.addConstr(theta >= 1 -  X_Master[v2]);
+			}*/
+			/////////////////////////////
 			model_Master.addConstr(theta >= ((1 - X_Master[v2]) * (grph.degree[v2] + 1)) - neighbors_of_v);
 			neighbors_of_v = 0;
 		}
@@ -311,10 +320,8 @@ int main(int argc, char *argv[])
 			cout << "No solution found, Gurobi optimization status = " << model_Master.get(GRB_IntAttr_Status) << endl;
 		}
 		else
-		{
-			
+		{		
 			int status = model_Master.get(GRB_IntAttr_Status);
-		//	cout << "Status = " << status << endl;
 			double obj_master = model_Master.get(GRB_DoubleAttr_ObjVal);
 			cout << "obj = " << obj_master << endl;		
 			vector<long>vec_of_interdicted_vertices;
@@ -327,7 +334,7 @@ int main(int argc, char *argv[])
 				}
 			}
 			cout << "num_interdicted_vertices : " << num_interdicted_vertices << endl;
-			cout << "theta : " << theta.get(GRB_DoubleAttr_X) << endl;
+			cout << endl <<"theta : " << theta.get(GRB_DoubleAttr_X) << endl;
 
 			cout << "****************" << endl;
 			cout << "# B&B nodes in interdiction = " << num_BB_Nodes << endl;
@@ -352,7 +359,7 @@ int main(int argc, char *argv[])
 	printf("Total Time : %.2fs\n", duration.count());
 
 	//print time to solve max kclub problem
-	printf("kclb Time : %.2fs\n", KclubTime);
+	printf("kclb Time : %.2fs\n", SclubTime);
 
 	return 0;
 }
