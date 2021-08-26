@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
 				}
 			}
 			cout << "num_interdicted_vertices : " << num_interdicted_vertices << endl;  // number of interdicted vertices
-			cout << endl << "theta : " << theta.get(GRB_DoubleAttr_X) << endl;   // size of the maximum s-club in the interdicted graph
+			cout << "theta : " << theta.get(GRB_DoubleAttr_X) << endl;   // size of the maximum s-club in the interdicted graph
 			cout << "# B&B nodes in interdiction = " << num_BB_Nodes << endl;
 			cout << "# of callbacks in interdiction  = " << num_callbacks_interdiction << endl;
 			cout << "# of lazy cuts in interdiction(Star) = " << num_Lazycuts_interdiction_1 << endl;
