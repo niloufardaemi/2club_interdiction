@@ -12,5 +12,5 @@ Large-Scale Social Networks" and is written in C++. If you wish to use or cite t
 	}
   
   
-  This repository includes 2 folders:
+
 
