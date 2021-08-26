@@ -9,8 +9,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <chrono>
-#include<iostream>
-#include<algorithm>
+#include <iostream>
+#include <algorithm>
 
 using namespace std;
 using namespace std::chrono;
@@ -20,13 +20,16 @@ bool sortcol(const vector<long>& v1, const vector<long>& v2)
 {
 	return v1[1] > v2[1];
 }
-long S_in_Sclb = 2;
-long num_BB_interdiction;
+
+long S_in_Sclb = 2;    //the parameter s in s-club
+
+// global variables to count the number of callbacks and lazy cuts
 long num_callbacks_interdiction;
-long num_Lazycuts_interdiction_1;
-long num_Lazycuts_interdiction_2;
-long num_Lazycuts_interdiction_3;
-double SclubTime = 0;
+long num_Lazycuts_interdiction_1;   // lazy cuts for s-clubs that form a star
+long num_Lazycuts_interdiction_2;	// lazy cuts for s-clubs with leavs
+long num_Lazycuts_interdiction_3;	// regular lazy cuts
+
+double SclubTime = 0;   // the total time to solve the maximum s-club problem in all the iterations
 
 
 
@@ -54,27 +57,30 @@ protected:
 		{
 			if (where == GRB_CB_MIPSOL)
 			{
-				num_callbacks_interdiction++;
+				num_callbacks_interdiction++;  // count the number of callbacks
 
+				// get the solution of the master problem
 				double *x_master = new double[n_Xvar];
 				x_master = getSolution(Xvar, n_Xvar);
+				double THETA = getSolution(Theta);
 
+				// if value of variable x is less than or equal to 0.5, it is not interdicted so x = 0
 				vector <long> non_interdicted_vertices;
-
-				for (int p2 = 0; p2 < n_Xvar; p2++)
+				for (long p2 = 0; p2 < n_Xvar; p2++)
 				{
 					if (x_master[p2] <= 0.5)
 					{
-						non_interdicted_vertices.push_back(p2);
+						non_interdicted_vertices.push_back(p2);  
 					}
-				}			
-				double THETA = getSolution(Theta);
+				}
+			
 
-				// mapping to find new adj list
+				// mapping to find the adjacency list of the graph after interdiction
 				vector<long> ReverseMap;
 				KGraph induced_g = graph_1.CreateInducedGraph(non_interdicted_vertices, ReverseMap);
 
-				vector <long> kclb_index;
+				// define requrired structures to solve the separation problem (max s-club) and add the lazy cuts
+				vector <long> sclb_index;
 				GRBLinExpr cut_in_master = 0;
 				GRBLinExpr Star = 0;
 				GRBLinExpr Leaves = 0;
@@ -82,58 +88,61 @@ protected:
 				bool leaf = false;
 				bool lazycut_added = false;
 
+				// solve the separation only if the interdicted graph has at least 2 vertices
 				if (induced_g.n >= 2)
 				{
-					auto start_sclub = chrono::steady_clock::now();
-
+					auto start_sclub = chrono::steady_clock::now();  // begin to compute the time for solving the separtion problem
+					
 					vector <long> HS;
 					bool Sub_Opt;
-					HS = HeuristicAndPreprocess(induced_g, S_in_Sclb);					
-					kclb_index = ICUT(induced_g, S_in_Sclb, HS);
+					HS = HeuristicAndPreprocess(induced_g, S_in_Sclb);   // find heuristic s-club
+					sclb_index = ICUT(induced_g, S_in_Sclb, HS);         // find maximum s-club
 
-					chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_sclub;
-					SclubTime += duration_sclb.count();
+					chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_sclub; // duration of solving the separation
+					SclubTime += duration_sclb.count();   
 
-
-					vector<long> kclb_original_index;
-					for (int i = 0; i < kclb_index.size(); i++)
+					// fiding the index of vertices in the original graph (before interdiction)
+					vector<long> sclb_original_index;
+					for (int i = 0; i < sclb_index.size(); i++)
 					{
-						kclb_original_index.push_back(non_interdicted_vertices[kclb_index[i]]);
+						sclb_original_index.push_back(non_interdicted_vertices[sclb_index[i]]);
 					}
-					KGraph induced_kclb = graph_1.CreateInducedGraph(kclb_original_index, ReverseMap);			
-					if (THETA < kclb_index.size())
+					KGraph induced_kclb = graph_1.CreateInducedGraph(sclb_original_index, ReverseMap);
+					
+					// add a cut if the solution of master problem is not feasible, i.e., theta < |s-club|
+					if (THETA < sclb_index.size())
 					{
-						for (long i = 0; i < kclb_index.size(); i++)
+						for (long i = 0; i < sclb_index.size(); i++)
 						{
 							if (lazycut_added == false)
 							{
-								cut_in_master += Xvar[non_interdicted_vertices[kclb_index[i]]];
+								cut_in_master += Xvar[non_interdicted_vertices[sclb_index[i]]];
 
-								if (induced_kclb.degree[i] == 1)
+								if (induced_kclb.degree[i] == 1) // check if vertex i is a leaf
 								{
-									Leaves += Xvar[non_interdicted_vertices[kclb_index[i]]];     // linear expr for cuts for leaves
+									Leaves += Xvar[non_interdicted_vertices[sclb_index[i]]];     // linear expr for cuts for leaves
 									leaf = true;
 								}
 
 								if (induced_kclb.degree[i] > 1)
 								{
-									Critical_vertices += Xvar[non_interdicted_vertices[kclb_index[i]]];
+									Critical_vertices += Xvar[non_interdicted_vertices[sclb_index[i]]];
 								}
-								if (induced_kclb.degree[i] == kclb_index.size() - 1)
+								if (induced_kclb.degree[i] == sclb_index.size() - 1)  // check if vertex i is the center of a star
 								{
-									// add cut for a star
+									// in this case, the s-club is a star with center i 
+									// add cut where H is all the vertices except i
 									Leaves = 0;
 									Critical_vertices = 0;
 									leaf = false;
 									cut_in_master = 0;
 
-									for (int j = 0; j < kclb_index.size(); j++)
+									for (int j = 0; j < sclb_index.size(); j++)
 									{
-										Star += Xvar[non_interdicted_vertices[kclb_index[j]]];
+										Star += Xvar[non_interdicted_vertices[sclb_index[j]]];
 									}
-									Star -= Xvar[non_interdicted_vertices[kclb_index[i]]];
-									//addLazy(Theta >= kclb_index.size() -  ((kclb_index.size() - 1) * Xvar[non_interdicted_vertices[kclb_index[i]]]) - Star);
-									addLazy(Theta >= (1 - Xvar[non_interdicted_vertices[kclb_index[i]]]) * (kclb_index.size()) - Star);
+									Star -= Xvar[non_interdicted_vertices[sclb_index[i]]];								
+									addLazy(Theta >= (1 - Xvar[non_interdicted_vertices[sclb_index[i]]]) * (sclb_index.size()) - Star);
 									num_Lazycuts_interdiction_1++;
 									Star = 0;
 									lazycut_added = true;
@@ -142,9 +151,10 @@ protected:
 						}
 						if (leaf == true && lazycut_added == false)
 						{
+							// in this case, the sclub contains leavs
+							// add cut where H is the set of the leavs in the s-club
 							cut_in_master = 0;
-							//addLazy(Theta >= kclb_index.size() - ((kclb_index.size() - 1) * Critical_vertices)  - Leaves);
-							addLazy(Theta >= (1 - Critical_vertices) * (kclb_index.size()) - Leaves);
+							addLazy(Theta >= (1 - Critical_vertices) * (sclb_index.size()) - Leaves);
 							num_Lazycuts_interdiction_2++;
 							Leaves = 0;
 							Critical_vertices = 0;
@@ -153,17 +163,18 @@ protected:
 						}
 						if (lazycut_added == false)
 						{
+							// no H is found, add a regular cut where H is empty
 							Leaves = 0;
 							Critical_vertices = 0;
 							leaf = false;
-							addLazy(Theta >= kclb_index.size() * (1 - cut_in_master));
+							addLazy(Theta >= sclb_index.size() * (1 - cut_in_master));
 							num_Lazycuts_interdiction_3++;
 							cut_in_master = 0;
 							lazycut_added = true;
 						}
 					}
-
-				} //end if of (g.size >= 2)
+				}
+				// reset the expressions and variables
 				Critical_vertices = 0;
 				Star = 0;
 				Leaves = 0;
@@ -171,12 +182,10 @@ protected:
 				lazycut_added = false;
 				cut_in_master = 0;
 				non_interdicted_vertices.clear();
-				kclb_index.clear();
-				delete[] x_master;				
-			
-			} // end if loop
-
-		}  //end try
+				sclb_index.clear();
+				delete[] x_master;
+			} 
+		}
 
 		catch (GRBException e)
 		{
@@ -188,9 +197,9 @@ protected:
 			cout << "Error during callback" << endl;
 		}
 
-	}      //end callback
+	}   
 
-};  // end addcut_theta class
+};  
 
 
 
@@ -201,22 +210,19 @@ int main(int argc, char *argv[])
 	if (argc < 2)
 		cerr << "ERROR: Not enough arguments.";
 
-
+	// read the input graph, format of the dataset and the value of the penalty (alpha)
 	KGraph grph(argv[2], argv[2], argv[1]);
 	double alpha = atof(argv[3]);
-	long num_interdicted_vertices = 0;
-
-
+	
 	// sort vertices based on the degree 
-	long highest_degree = floor(grph.n * 0.2);
 	vector< vector <long>> sorted_degree(grph.n);
 	for (long i = 0; i < grph.n; i++)
 	{
 		sorted_degree[i].push_back(i);
 		sorted_degree[i].push_back(grph.degree[i]);
 	}
-
 	sort(sorted_degree.begin(), sorted_degree.end(), sortcol);
+
 
 	// Master (interdiction) Problem 
 	try {
@@ -234,28 +240,18 @@ int main(int argc, char *argv[])
 			X_Master[p1].set(GRB_DoubleAttr_Obj, alpha);
 		}
 		theta.set(GRB_DoubleAttr_Obj, 1);
-		
-		// add constr for 20% of the vertices
-		GRBLinExpr neighbors_of_v = GRBLinExpr();
-		long v2;
 
+		// add constr for the top 20% of vertices by degree	
+		long v2;  
+		long highest_degree = floor(grph.n * 0.2);   // the number of vertices we add a constraint for them
+		GRBLinExpr neighbors_of_v = GRBLinExpr();
 		for (long v1 = 0; v1 < highest_degree; v1++)
 		{
-			v2 = sorted_degree[v1][0];
+			v2 = sorted_degree[v1][0];  
 			for (long v3 = 0; v3 < grph.degree[v2]; v3++)
 			{
-				neighbors_of_v += X_Master[grph.adj[v2][v3]];
+				neighbors_of_v += X_Master[grph.adj[v2][v3]]; 
 			}
-			//////////////////////////////
-			/*if (grph.degree[v2] >= 1)
-			{
-				model_Master.addConstr(theta >= grph.degree[v2] + 1 - (grph.degree[v2] * X_Master[v2]) - neighbors_of_v);
-			}
-			if (grph.degree[v2] == 0)
-			{
-				model_Master.addConstr(theta >= 1 -  X_Master[v2]);
-			}*/
-			/////////////////////////////
 			model_Master.addConstr(theta >= ((1 - X_Master[v2]) * (grph.degree[v2] + 1)) - neighbors_of_v);
 			neighbors_of_v = 0;
 		}
@@ -267,7 +263,6 @@ int main(int argc, char *argv[])
 		//Specify the use of lazy constraints
 		model_Master.getEnv().set(GRB_IntParam_LazyConstraints, 1);
 
-
 		//Set feasibility vs optimality balance
 		model_Master.getEnv().set(GRB_IntParam_MIPFocus, 0);
 		//1-feasible sols quickly;2-prove optimality;3-focus on MIP bound; default is 0
@@ -277,7 +272,6 @@ int main(int argc, char *argv[])
 
 		//Set root node LPR solver
 		model_Master.getEnv().set(GRB_IntParam_Method, -1);
-
 		//-1=automatic, 0=primal simplex, 1=dual simplex, 2=barrier, 3=concurrent, 4=deterministic concurrent
 
 		//Set BC node LPR solver
@@ -302,17 +296,17 @@ int main(int argc, char *argv[])
 		model_Master.set(GRB_IntAttr_ModelSense, 1);
 
 		// Save log file
-		model_Master.set(GRB_StringParam_LogFile,"instancelogfile");
+		model_Master.set(GRB_StringParam_LogFile, "logfile");
 
 		model_Master.update();
 
+
 		// set callback
 		addlazycut_theta cb1 = addlazycut_theta(X_Master, theta, grph.n, grph);
-
 		model_Master.setCallback(&cb1);
 		model_Master.optimize();
 
-		long num_BB_Nodes = (long)model_Master.get(GRB_DoubleAttr_NodeCount);
+		long num_BB_Nodes = (long)model_Master.get(GRB_DoubleAttr_NodeCount);  // number of explored nodes
 
 		//update curr_best_kclb when better solution is available
 		if (model_Master.get(GRB_IntAttr_SolCount) == 0)
@@ -320,23 +314,19 @@ int main(int argc, char *argv[])
 			cout << "No solution found, Gurobi optimization status = " << model_Master.get(GRB_IntAttr_Status) << endl;
 		}
 		else
-		{		
-			int status = model_Master.get(GRB_IntAttr_Status);
-			double obj_master = model_Master.get(GRB_DoubleAttr_ObjVal);
-			cout << "obj = " << obj_master << endl;		
-			vector<long>vec_of_interdicted_vertices;
+		{
+			double obj_master = model_Master.get(GRB_DoubleAttr_ObjVal);  // objective value of the master problem
+			cout << "obj = " << obj_master << endl;
+			long num_interdicted_vertices = 0;
 			for (int i = 0; i < grph.n; i++)
 			{
 				if (X_Master[i].get(GRB_DoubleAttr_X) > 0.5)
 				{
-					vec_of_interdicted_vertices.push_back(i);
 					num_interdicted_vertices++;
 				}
 			}
-			cout << "num_interdicted_vertices : " << num_interdicted_vertices << endl;
-			cout << endl <<"theta : " << theta.get(GRB_DoubleAttr_X) << endl;
-
-			cout << "****************" << endl;
+			cout << "num_interdicted_vertices : " << num_interdicted_vertices << endl;  // number of interdicted vertices
+			cout << endl << "theta : " << theta.get(GRB_DoubleAttr_X) << endl;   // size of the maximum s-club in the interdicted graph
 			cout << "# B&B nodes in interdiction = " << num_BB_Nodes << endl;
 			cout << "# of callbacks in interdiction  = " << num_callbacks_interdiction << endl;
 			cout << "# of lazy cuts in interdiction(Star) = " << num_Lazycuts_interdiction_1 << endl;
@@ -358,7 +348,7 @@ int main(int argc, char *argv[])
 	chrono::duration <double> duration = chrono::steady_clock::now() - start;
 	printf("Total Time : %.2fs\n", duration.count());
 
-	//print time to solve max kclub problem
+	//print time to solve max sclub problem
 	printf("kclb Time : %.2fs\n", SclubTime);
 
 	return 0;
