@@ -1,4 +1,3 @@
-//#define _GLIBCXX_USE_CXX11_ABI = 0;
 #include "GRBInterface.h"
 #include <sstream>
 #include <ctime>
@@ -152,7 +151,7 @@ void Kclub_callback::callback()
 								long v = minimal_length_k_ab_separator[q];
 								expr -= vars[v];
 							}
-						
+
 							addLazy(expr <= 1);
 							numLazyCuts++;
 						}
@@ -240,138 +239,6 @@ long KNeighborhoodSize(KGraph &g, long k, long v)
 	return KNeighborhoodSize(g, W, k, v);
 }
 
-vector<long> solve2Club(KGraph &g, long k, vector<long> &HeuristicSolution, bool &subOpt)
-{
-
-	vector<long> S;
-	subOpt = true;
-	vector< vector< long> > components;
-	vector<long> degreeZero;
-	g.FindConnectedComponents(components, degreeZero);
-	long lb = HeuristicSolution.size();
-
-	try
-	{
-		GRBEnv env = GRBEnv();
-		env.set(GRB_IntParam_OutputFlag, 0);
-		env.set(GRB_IntParam_Method, 3); //concurrent  
-		env.set(GRB_DoubleParam_TimeLimit, 3600);
-		env.set(GRB_DoubleParam_MIPGap, 0.0);
-		GRBModel model = GRBModel(env);
-		GRBVar *X = model.addVars(g.n, GRB_BINARY);
-		GRBVar *Y = model.addVars(components.size(), GRB_BINARY);
-		model.update();
-
-
-		// Adding objective function
-		for (long w = 0; w < g.n; w++)
-			X[w].set(GRB_DoubleAttr_Obj, 1);
-		model.set(GRB_IntAttr_ModelSense, GRB_MAXIMIZE);
-
-
-		// Fixing singletons to zero.
-		for (long i = 0; i < degreeZero.size(); i++)
-		{
-			long v = degreeZero[i];
-			model.addConstr(X[v] == 0);
-		}
-
-		// Fixing y[i]=0 when |V(G_i)| < lb.
-		for (long i = 0; i < components.size(); i++)
-		{
-			if (components[i].size() < lb)
-			{
-				model.addConstr(Y[i] == 0);
-			}
-		}
-
-		// Adding X[v] + X[q] - X[N(a) \cap N(b)] <= 1 
-		for (long i = 0; i < components.size(); i++)
-		{
-			// add all constraints within component i
-			for (long j = 0; j < components[i].size(); j++)
-			{
-				long v = components[i][j]; // v is a vertex in component i.
-				vector<bool> neighbors(g.n, false);
-				long w;
-				for (long q = 0; q < g.degree[v]; q++)
-				{
-					w = g.adj[v][q];
-					neighbors[w] = true;
-				}
-
-				for (long q = v + 1; q < g.n; q++)
-				{
-					if (neighbors[q]) continue;
-					vector<long> p = g.CommonNeighborsList(v, q);
-
-					GRBLinExpr expr = 0;
-					for (long k = 0; k < p.size(); k++)
-					{
-						expr += X[p[k]];
-					}
-					expr = X[v] + X[q] - expr;
-					model.addConstr(expr <= 1);
-				}
-			}
-		}
-
-
-		// Adding \sigma_i y_i <= 1 constraints.
-		GRBLinExpr expr = 0;
-		for (long i = 0; i < components.size(); i++)
-		{
-			expr += Y[i];
-		}
-		model.addConstr(expr <= 1);
-
-
-
-		// Adding X[v] <= Y[i] constraints.
-		for (long i = 0; i < components.size(); i++)
-		{
-			for (long j = 0; j < components[i].size(); j++)
-			{
-				long v = components[i][j];  // v is a vertex in component i
-				model.addConstr(X[v] <= Y[i]);
-			}
-		}
-		model.update();
-
-		// Providing initial solution
-		for (long i = 0; i < g.n; i++)
-			X[i].set(GRB_DoubleAttr_Start, 0);
-
-		for (long i = 0; i < HeuristicSolution.size(); i++)
-		{
-			long v = HeuristicSolution[i];
-			X[v].set(GRB_DoubleAttr_Start, 1);
-		}
-
-		model.optimize();
-
-		double bestLB = model.get(GRB_DoubleAttr_ObjVal);
-		double bestUB = model.get(GRB_DoubleAttr_ObjBound);
-		cout << bestLB << " " << bestUB << " ";
-
-		int status = model.get(GRB_IntAttr_Status);
-		if (status == GRB_OPTIMAL)
-		{
-			subOpt = false;
-			for (long l = 0; l < g.n; l++)
-				if (X[l].get(GRB_DoubleAttr_X) > 0.5)
-					S.push_back(l);
-		}
-	}
-	catch (GRBException e) {
-		cout << "Error code = " << e.getErrorCode() << endl;
-		cout << e.getMessage() << endl;
-	}
-	catch (...) {
-		cout << "Error during optimization" << endl;
-	}
-	return S;
-}
 
 vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSolution, bool &subOpt)
 {
@@ -387,7 +254,7 @@ vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSol
 		GRBEnv env = GRBEnv();
 		env.set(GRB_IntParam_Method, 3); //concurrent 
 		env.set(GRB_IntParam_OutputFlag, 0);
-		env.set(GRB_DoubleParam_TimeLimit, 3600);	
+		env.set(GRB_DoubleParam_TimeLimit, 3600);
 		env.set(GRB_IntParam_LazyConstraints, 1);
 		env.set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBModel model = GRBModel(env);
@@ -697,58 +564,4 @@ vector <long> ICUT(KGraph &g, long k, vector<long> &BestKClub)
 	cout << "bestLB = " << BestLowerBound << ", bestUB = " << BestUpperBound << " ";
 	return BestKClub;
 }
-
-
-//
-//void ICUT(KGraph &g, long k, vector<long> &BestKClub)
-//{
-//
-//	time_t start = clock();
-//	KGraph gk = g.CreatePowerGraph(k);
-//
-//	long BestLowerBound = BestKClub.size();
-//	long BestUpperBound = BestKClub.size();
-//
-//	vector<long> degeneracyordering = gk.FindDegeneracyOrdering();
-//	vector<bool> T(g.n, false);
-//
-//	for (long i = g.n - 1; i >= 0; i--)
-//	{
-//		vector<long> SubproblemVertices;
-//
-//		long v = degeneracyordering[i];
-//		T[v] = true;
-//		vector<long> dist_from_v = g.ShortestPathsUnweighted(v, T);
-//
-//		for (long j = 0; j < g.n; j++)
-//			if (dist_from_v[j] <= k)
-//				SubproblemVertices.push_back(j);
-//
-//		if (SubproblemVertices.size() <= BestLowerBound) continue;
-//
-//		vector<long> Rmap;
-//		KGraph g_subproblem = g.CreateInducedGraph(SubproblemVertices, Rmap);
-//
-//		long SubProblemLB;
-//		long SubProblemUB;
-//		vector<long> SubproblemSolution = ICUT_Subproblem(g_subproblem, k, Rmap[v], BestLowerBound, SubProblemLB, SubProblemUB);
-//
-//		BestLowerBound = max(BestLowerBound, SubProblemLB);
-//		BestUpperBound = max(BestUpperBound, SubProblemUB);
-//
-//		if (SubproblemSolution.size() >= BestLowerBound)
-//		{
-//			BestKClub = SubproblemSolution;
-//			for (long q = 0; q < BestLowerBound; q++)
-//			{
-//				long v = BestKClub[q];
-//				long w = SubproblemVertices[v];
-//				BestKClub[q] = w;
-//			}
-//		}
-//	}
-//	cout << "bestLB = " << BestLowerBound << ", bestUB = " << BestUpperBound << " ";
-//}
-
-
 
