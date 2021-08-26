@@ -1,4 +1,3 @@
-//#define _GLIBCXX_USE_CXX11_ABI = 0;
 #include "KGraph.h"
 #include <algorithm>
 #include <cmath>
@@ -7,9 +6,9 @@
 #include <set>
 #include <map>
 #include <omp.h>
-#include <string>       // std::string
-#include <iostream>     // std::cout
-#include <sstream>      // std::istringstream
+#include <string>       
+#include <iostream>   
+#include <sstream>     
 
 using namespace std;
 
@@ -160,6 +159,8 @@ vector<long> KGraph::MultiSourceShortestPaths(vector<long> &D, vector<bool> &S)
 	}
 	return dist;
 }
+
+
 long KGraph::LongestShortestPathUnweighted(long origin)
 {
 	vector<long> SP = ShortestPathsUnweighted(origin);
@@ -659,6 +660,7 @@ vector<long> KGraph::FindDegeneracyOrdering(vector<long> &rightdegree)
 	//cerr << "\n Degeneracy = " << degeneracy << endl;
 	return vert;
 }
+
 vector<long> KGraph::FindDegeneracyOrdering()
 {
 	vector<long> rightdegree;
@@ -753,7 +755,7 @@ void KGraph::ReadDIMACSGraph(string file)
 	string temp;
 	long u, v;
 	ifstream input;
-	
+
 	input.open(file.c_str(), ios::in);
 	if (!input.is_open())
 	{
@@ -794,7 +796,7 @@ void KGraph::ReadDIMACSGraph(string file)
 			cerr << ".";
 		if (line == "") continue;
 		istringstream iLine = istringstream(line);
-		
+
 		v = -1;
 		while (!iLine.eof())
 		{
@@ -837,7 +839,7 @@ void KGraph::ReadDIMACSColorGraph(string file)
 	string temp;
 	long u, v;
 	ifstream input;
-	
+
 	input.open(file.c_str(), ios::in);
 	if (!input.is_open())
 	{
@@ -853,7 +855,7 @@ void KGraph::ReadDIMACSColorGraph(string file)
 		if (line != "" && line[0] != 'c')
 			lineread = true;
 	}
-    istringstream nLine = istringstream(line);
+	istringstream nLine = istringstream(line);
 	string p;
 	nLine >> p >> temp >> n >> m1;
 
@@ -870,7 +872,7 @@ void KGraph::ReadDIMACSColorGraph(string file)
 			cerr << ".";
 		getline(input, line);
 		istringstream nLine = istringstream(line);
-		
+
 		nLine >> temp;
 		if (temp == "e")
 		{
@@ -918,7 +920,7 @@ void KGraph::ReadDIMACSGraphParallel(string file)
 	long m1;
 	string temp;
 	ifstream input;
-	
+
 	input.open(file.c_str(), ios::in);
 	if (!input.is_open())
 	{
@@ -935,7 +937,7 @@ void KGraph::ReadDIMACSGraphParallel(string file)
 			lineread = true;
 	}
 	istringstream nLine = istringstream(line);
-	
+
 	nLine >> n >> m1;
 
 	cerr << n << " nodes, " << m1 << " edges.\n";
@@ -986,7 +988,7 @@ void KGraph::ReadDIMACSGraphParallel(string file)
 				//cerr<<tid<<"------Using \t"<<i<<"\t"<<lineNum<<endl;
 				if (line == "") continue;
 				istringstream iLine = istringstream(line);
-				
+
 				v = -1;
 
 				while (!iLine.eof())
@@ -1086,7 +1088,7 @@ void KGraph::ReadSNAPGraph(string file)
 	string temp;
 	long u, v;
 	ifstream input;
-	
+
 	input.open(file.c_str(), ios::in);
 	if (!input.is_open())
 	{
