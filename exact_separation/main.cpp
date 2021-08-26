@@ -29,8 +29,8 @@ long num_Lazycuts_interdiction_1;   // lazy cuts for s-clubs that form a star
 long num_Lazycuts_interdiction_2;	// lazy cuts for s-clubs with leavs
 long num_Lazycuts_interdiction_3;	// regular lazy cuts
 
-double SclubTime = 0;   // the total time to solve the maximum s-club problem in all the iterations
-
+// the total time to solve the maximum s-club problem in all the iterations
+double SclubTime = 0;   
 
 
 class addlazycut_theta : public GRBCallback
