@@ -21,7 +21,7 @@ bool sortcol(const vector<long>& v1, const vector<long>& v2)
 	return v1[1] > v2[1];
 }
 
-long S_in_Sclb = 2;    //the parameter s in s-club
+long s = 2;    //the parameter s in s-club
 
 // global variables to count the number of callbacks and lazy cuts
 long num_callbacks_interdiction;
