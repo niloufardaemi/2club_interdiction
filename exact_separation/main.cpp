@@ -78,14 +78,6 @@ protected:
 				vector<long> ReverseMap;
 				KGraph induced_g = graph_1.CreateInducedGraph(non_interdicted_vertices, ReverseMap);
 
-				// define requrired structures to solve the separation problem (max s-club) and add the lazy cuts
-				vector <long> sclb_index;
-				GRBLinExpr cut_in_master = 0;
-				GRBLinExpr Star = 0;
-				GRBLinExpr Leaves = 0;
-				GRBLinExpr Critical_vertices = 0;
-				bool leaf = false;
-				bool lazycut_added = false;
 
 				// solve the separation only if the interdicted graph has at least 2 vertices
 				if (induced_g.n >= 2)
@@ -93,6 +85,7 @@ protected:
 					auto start_sclub = chrono::steady_clock::now();  // begin to compute the time for solving the separtion problem
 					
 					vector <long> HS;
+					vector <long> sclb_index;
 					HS = HeuristicAndPreprocess(induced_g, s);   // find the heuristic s-club in the interdicted graph
 					sclb_index = ICUT(induced_g, s, HS);         // find maximum s-club in the interdicted graph
 
@@ -109,7 +102,15 @@ protected:
 							sclb_original_index.push_back(non_interdicted_vertices[sclb_index[i]]);
 						}
 						KGraph induced_kclb = graph_1.CreateInducedGraph(sclb_original_index, ReverseMap);
-					
+						
+						// define requrired structures to add the lazy cut						
+						GRBLinExpr cut_in_master = 0;
+						GRBLinExpr Star = 0;
+						GRBLinExpr Leaves = 0;
+						GRBLinExpr Critical_vertices = 0;
+						bool leaf = false;
+						bool lazycut_added = false;
+						
 						for (long i = 0; i < sclb_index.size(); i++)
 						{
 							if (lazycut_added == false)
