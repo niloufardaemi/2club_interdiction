@@ -74,7 +74,6 @@ protected:
 					}
 				}
 			
-
 				// mapping to find the adjacency list of the graph after interdiction
 				vector<long> ReverseMap;
 				KGraph induced_g = graph_1.CreateInducedGraph(non_interdicted_vertices, ReverseMap);
@@ -94,14 +93,13 @@ protected:
 					auto start_sclub = chrono::steady_clock::now();  // begin to compute the time for solving the separtion problem
 					
 					vector <long> HS;
-					bool Sub_Opt;
-					HS = HeuristicAndPreprocess(induced_g, S_in_Sclb);   // find heuristic s-club
-					sclb_index = ICUT(induced_g, S_in_Sclb, HS);         // find maximum s-club
+					HS = HeuristicAndPreprocess(induced_g, S_in_Sclb);   // find the heuristic s-club in the interdicted graph
+					sclb_index = ICUT(induced_g, S_in_Sclb, HS);         // find maximum s-club in the interdicted graph
 
 					chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_sclub; // duration of solving the separation
 					SclubTime += duration_sclb.count();   
 
-					// fiding the index of vertices in the original graph (before interdiction)
+					// converting the index of vertices to the indices in the original graph (before interdiction)
 					vector<long> sclb_original_index;
 					for (int i = 0; i < sclb_index.size(); i++)
 					{
@@ -120,7 +118,7 @@ protected:
 
 								if (induced_kclb.degree[i] == 1) // check if vertex i is a leaf
 								{
-									Leaves += Xvar[non_interdicted_vertices[sclb_index[i]]];     // linear expr for cuts for leaves
+									Leaves += Xvar[non_interdicted_vertices[sclb_index[i]]];     
 									leaf = true;
 								}
 
