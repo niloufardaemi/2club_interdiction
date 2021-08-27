@@ -27,8 +27,7 @@ The following steps show how to compile and run the code to find the maximum 2-c
 
 1. Download or clone the repository to your machine.
 2. Build the project.
-3. In the command prompt, change the directory to the one that the project is stored.
-4. In the command promp, type the following  command with space instead of each cooma: project name.exe, dataset format (dimacs/snap_d), dataset directory,\, dataset name, value of alpha, and hit enter.
+3. In the command prompt, change the directory to the one that the project is stored and type the following command with space instead of each comma: project name.exe, dataset format (dimacs/snap_d), dataset directory/, dataset name, value of alpha, and hit enter.
 
 
 # Terms and Use:
@@ -61,4 +60,4 @@ SOFTWARE.
 
 We would like to thank Austin Buchanan and Hosseinali Salemi for providing
 us the codes used in [Salemi and Buchanan 2020] (https://link.springer.com/article/10.1007/s12532-020-00175-6) and freely offering their help
-to integrate it with our code. Files "GRBINterface.cpp", "GRBInterface.h", "KGraph.cpp" and "KGraph.h" in our repository are part of therir codes with some modifications. Their code in the original form is availble here: https://github.com/halisalemi/ParsimoniousKClub
+to integrate it with our code. All the files in our repository except main.cpp are part of therir codes with some modifications. Their code in the original form is availble here: https://github.com/halisalemi/ParsimoniousKClub
