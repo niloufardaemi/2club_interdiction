@@ -25,7 +25,6 @@ long KNeighborhoodSize(KGraph &g, long k, long v);
 long KNeighborhoodSize(KGraph &g, vector<bool> &W, long k, long v);
 
 
-vector<long> solve2Club(KGraph &g, long k, vector<long> &HeuristicSolution, bool &subOpt);
 
 // Our cut-like formulation for max k-club. Uses the routine MINIMALIZE to strengthen the cuts.
 vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSolution, bool &subOpt);
