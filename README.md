@@ -1,4 +1,4 @@
-# Code for interdicting the maximum s-club in a graph
+# Code for interdicting the maximum 2-club in a graph
 
 This code accompanies the paper "Interdicting Low-Diameter Cohesive Subgroups in
 Large-Scale Social Networks" and is written in C++. If you wish to use or cite this code, please cite the paper:
