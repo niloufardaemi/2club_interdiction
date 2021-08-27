@@ -437,7 +437,7 @@ int main(int argc, char *argv[])
 	printf("Total Time : %.2fs\n", duration.count());
 
 	//print time to solve max sclub problem
-	printf("kclb Time : %.2fs\n", SclubTime);
+	printf("sclb Time : %.2fs\n", SclubTime);
 
 	return 0;
 }
