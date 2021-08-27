@@ -1,4 +1,4 @@
-### Code for interdicting the maximum s-club in a graph
+# Code for interdicting the maximum s-club in a graph
 
 This code accompanies the paper "Interdicting Low-Diameter Cohesive Subgroups in
 Large-Scale Social Networks" and is written in C++. If you wish to use or cite this code, please cite the paper:
@@ -21,7 +21,7 @@ This repository includes two folders:
 
 
 
-## Compiling the code
+# Compiling the code
 
 The following steps show how to compile and run the code to find the maximum 2-club in the interdicted graph in a Windows environment.
 
@@ -31,7 +31,7 @@ The following steps show how to compile and run the code to find the maximum 2-c
 4. In the command promp, type the following  command with space instead of each cooma: project name.exe, dataset format (dimacs/snap_d), dataset directory,\, dataset name, value of alpha, and hit enter.
 
 
-### Terms and Use:
+# Terms and Use:
 
 MIT License
 
@@ -57,7 +57,7 @@ SOFTWARE.
 
 
 
-### Acknowledgments
+# Acknowledgments
 
 We would like to thank Austin Buchanan and Hosseinali Salemi for providing
 us the codes used in [Salemi and Buchanan 2020] (https://link.springer.com/article/10.1007/s12532-020-00175-6) and freely offering their help
