@@ -93,23 +93,23 @@ protected:
 					auto start_sclub = chrono::steady_clock::now();  // begin to compute the time for solving the separtion problem
 					
 					vector <long> HS;
-					HS = HeuristicAndPreprocess(induced_g, S_in_Sclb);   // find the heuristic s-club in the interdicted graph
-					sclb_index = ICUT(induced_g, S_in_Sclb, HS);         // find maximum s-club in the interdicted graph
+					HS = HeuristicAndPreprocess(induced_g, s);   // find the heuristic s-club in the interdicted graph
+					sclb_index = ICUT(induced_g, s, HS);         // find maximum s-club in the interdicted graph
 
 					chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_sclub; // duration of solving the separation
 					SclubTime += duration_sclb.count();   
-
-					// converting the index of vertices to the indices in the original graph (before interdiction)
-					vector<long> sclb_original_index;
-					for (int i = 0; i < sclb_index.size(); i++)
-					{
-						sclb_original_index.push_back(non_interdicted_vertices[sclb_index[i]]);
-					}
-					KGraph induced_kclb = graph_1.CreateInducedGraph(sclb_original_index, ReverseMap);
 					
 					// add a cut if the solution of master problem is not feasible, i.e., theta < |s-club|
 					if (THETA < sclb_index.size())
 					{
+						// converting the index of vertices to the indices in the original graph (before interdiction)
+						vector<long> sclb_original_index;
+						for (int i = 0; i < sclb_index.size(); i++)
+						{
+							sclb_original_index.push_back(non_interdicted_vertices[sclb_index[i]]);
+						}
+						KGraph induced_kclb = graph_1.CreateInducedGraph(sclb_original_index, ReverseMap);
+					
 						for (long i = 0; i < sclb_index.size(); i++)
 						{
 							if (lazycut_added == false)
