@@ -23,15 +23,12 @@ This repository includes two folders:
 
 ## Compiling the code
 
-The following steps show how to compile and run the code to find r-robust s-clubs in a Linux environment using a makefile (you can also run the code in Mac or Windows environment by configuring your IDE appropriately). In the folder of r_robust_s_club, parameter.txt is used to configure parameters r and s, and the "data" folder includes InputFile.txt (used to determine which instances you want to test) and 10th DIMACS graph instances (you can also downlaod these instances from the website: https://www.cc.gatech.edu/dimacs10/archive/clustering.shtml). It is similar to run the code to find h-hereditary s-clubs.
+The following steps show how to compile and run the code to find the maximum 2-club in the interdicted graph in a Windows environment.
 
-## Steps to run the code to find r-robust s-clubs in Linux environment:
-
-Download or clone the repository to your machine.
-Go to the folder r_robust_s_club.
-Open the "Makefile" and set GUROBI_HOME to the directory of your Gurobi installation, e.g.: /opt/gurobi/9.0.1/linux64.
-From the terminal, go to the folder of r_robust_s_club.
-Type "make" and hit enter to compile. After successful complilation, type "./main" to run the code.
+1. Download or clone the repository to your machine.
+2. Build the project.
+3. In the command prompt, change the directory to the one that the project is stored.
+4. In the command promp, type the following  command with space instead of each cooma: project name.exe, dataset format (dimacs/snap_d), dataset directory,\, dataset name, value of alpha, and hit enter.
 
 
 ### Terms and Use:
