@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
 		}
 		theta.set(GRB_DoubleAttr_Obj, 1);
 
-		// add constr for the top 20% of vertices by degree	
+		// add constraint for the top 20% of vertices by degree	
 		long v2;
 		long highest_degree = floor(grph.n * 0.2);   // the number of vertices we add a constraint for them
 		GRBLinExpr neighbors_of_v = GRBLinExpr();
@@ -393,8 +393,6 @@ int main(int argc, char *argv[])
 		model_Master.setCallback(&cb1);
 		model_Master.optimize();
 
-		
-		//update curr_best_kclb when better solution is available
 		if (model_Master.get(GRB_IntAttr_SolCount) == 0)
 		{
 			cout << "No solution found, Gurobi optimization status = " << model_Master.get(GRB_IntAttr_Status) << endl;
@@ -419,7 +417,7 @@ int main(int argc, char *argv[])
 			cout << "# of lazy cuts in interdiction (leaves) = " << num_Lazycuts_interdiction_2 << endl;
 			cout << "# of lazy cuts in interdiction (regular) = " << num_Lazycuts_interdiction_3 << endl;
 			cout << "number of times HS finds cut: " << HS_Counter << endl;
-			cout<< "number of times ICUT sub finds cut: " << ICUT_Counter << endl;
+			cout << "number of times ICUT sub finds cut: " << ICUT_Counter << endl;
 		}
 	}
 
