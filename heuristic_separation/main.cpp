@@ -181,7 +181,9 @@ protected:
 					else  
 					{
 						auto start_sclub = chrono::steady_clock::now();   
-						sclb_index = ICUT(induced_g, s, HS, THETA, ICUT_Counter);   // call ICUT to solve the maximum the s-club problem (not necessarily to optimality, see the ICUT function in GRBInterface.cpp)
+						// call ICUT to solve the maximum the s-club problem 
+						// ICUT is not solved to optimality; when a solution greater that THETA + 1.5 is found, solver stops
+						sclb_index = ICUT(induced_g, s, HS, THETA, ICUT_Counter);
 						chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_sclub;
 						SclubTime += duration_sclb.count();
 
