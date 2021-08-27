@@ -25,17 +25,17 @@ vector<long> HeuristicAndPreprocess(KGraph &g, long k)
 	vector<long> rd;  // right-degree of degeneracy ordering.
 	vector<long> degeneracyordering = gk.FindDegeneracyOrdering(rd);
 	vector<long> kclique = gk.FindHeuristicClique(degeneracyordering, rd);
-	//cerr << "k-clique (heuristic) size is = " << kclique.size() << endl;
+	cerr << "k-clique (heuristic) size is = " << kclique.size() << endl;
 
 	// perform DROP heuristic, with kclique as starting point.
 	vector<bool> HeuristicSolution = boolify(kclique, g.n); // make the heuristic kclique into a boolean form
 	vector<long> DROP_Solution = DROP(g, HeuristicSolution, k);
 	long lb = DROP_Solution.size();
-	//cerr << "Drop heuristic gives LB = " << lb << endl;
+	cerr << "Drop heuristic gives LB = " << lb << endl;
 
 	// perform preprocessing
 	vector<long> kcorevertices = gk.FindVerticesOfKCore(degeneracyordering, rd, lb - 1);
-	//cerr << "Preprocessed instances has this many vertices = " << kcorevertices.size() << endl;
+	cerr << "Preprocessed instances has this many vertices = " << kcorevertices.size() << endl;
 	g.FindInducedGraph(kcorevertices);
 
 	return DROP_Solution;
