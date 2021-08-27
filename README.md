@@ -1,3 +1,5 @@
+### Code for interdicting the maximum s-club in a graph
+
 This code accompanies the paper "Interdicting Low-Diameter Cohesive Subgroups in
 Large-Scale Social Networks" and is written in C++. If you wish to use or cite this code, please cite the paper:
 
@@ -14,6 +16,6 @@ Large-Scale Social Networks" and is written in C++. If you wish to use or cite t
   
 This repository includes two folders:
 
-exact_separation: used to solve the separation problem (maximum s-club) to optimality.
-heuristic_separation: used to first try heuristic approaches to solve the separation problem and solving it to optimality only if needed.
+1. exact_separation: used to solve the separation problem (maximum s-club) to optimality.
+2. heuristic_separation: used to first try heuristic approaches to solve the separation problem and solving it to optimality only if needed.
 
