@@ -21,7 +21,7 @@ bool sortcol(const vector<long>& v1, const vector<long>& v2)
 	return v1[1] > v2[1];
 }
 
-long s = 2;    //the parameter s in s-club
+long s = 2;    // parameter s in s-club
 
 // global variables to count the number of callbacks and lazy cuts
 long num_callbacks_interdiction;
@@ -29,7 +29,7 @@ long num_Lazycuts_interdiction_1;   // lazy cuts for s-clubs that form a star
 long num_Lazycuts_interdiction_2;	// lazy cuts for s-clubs with leavs
 long num_Lazycuts_interdiction_3;	// regular lazy cuts
 
-// the total time to solve the maximum s-club problem in all the iterations
+// total time to solve the maximum s-club problem in all the iterations
 double SclubTime = 0;   
 
 
