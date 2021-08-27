@@ -82,21 +82,11 @@ protected:
 				vector<long> ReverseMap;
 				KGraph induced_g = graph_1.CreateInducedGraph(non_interdicted_vertices, ReverseMap);
 				
-				// define requrired structures to solve the separation problem (max s-club) and add the lazy cuts
-				vector <long> sclb_index;
-				vector <long> HS;     // to keep the heuuristic s-club
-				GRBLinExpr cut_in_master = 0;
-				GRBLinExpr Star = 0;
-				GRBLinExpr Leaves = 0;
-				GRBLinExpr Critical_vertices = 0;
-				bool leaf = false;
-				bool lazycut_added = false;
-
 				// solve the separation only if the interdicted graph has at least 2 vertices
 				if (induced_g.n >= 2)
 				{								
-					auto start_HS_sclub = chrono::steady_clock::now();   // begin to compute the time for solving the separtion problem
-					HS = HeuristicAndPreprocess(induced_g, s);         // find the heuristic s-club in the interdicted graph
+					auto start_HS_sclub = chrono::steady_clock::now();   // begin to compute the time for solving the separtion problem  
+					vector <long> HS = HeuristicAndPreprocess(induced_g, s);         // find the heuristic s-club in the interdicted graph
 					chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_HS_sclub;  // duration of finding the heuristic s-club
 					SclubTime += duration_sclb.count();
 
@@ -114,7 +104,14 @@ protected:
 						}
 						KGraph induced_HS = graph_1.CreateInducedGraph(HS_original_index, ReverseMap);
 
-
+						// define requrired structures to add the lazy cut
+						GRBLinExpr cut_in_master = 0;
+						GRBLinExpr Star = 0;
+						GRBLinExpr Leaves = 0;
+						GRBLinExpr Critical_vertices = 0;
+						bool leaf = false;
+						bool lazycut_added = false;
+						
 						// add a lazy cut:
 						for (long i = 0; i < HS.size(); i++)
 						{
@@ -260,16 +257,6 @@ protected:
 						}
 					} 
 				} 
-				// reset the expressions and variables
-				Critical_vertices = 0;
-				Star = 0;
-				Leaves = 0;
-				leaf = false;
-				lazycut_added = false;
-				cut_in_master = 0;
-				non_interdicted_vertices.clear();
-				sclb_index.clear();
-				HS.clear();
 				delete[] x_master;
 			} 
 		}
