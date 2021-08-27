@@ -7,6 +7,9 @@ authors:
 - family-names: "Borrero"
   given-names: "Juan"
   orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: "Balasundrum"
+  given-names: "Baski"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
 title: "2club_interdiction"
 version: 1.0.0
 doi: 10.5281/zenodo.1234
