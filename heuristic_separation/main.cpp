@@ -402,7 +402,6 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			int status = model_Master.get(GRB_IntAttr_Status);
 			double obj_master = model_Master.get(GRB_DoubleAttr_ObjVal);  // objective value of the master problem
 			cout << "obj = " << obj_master << endl;
 			long num_interdicted_vertices = 0;
