@@ -29,7 +29,7 @@ long num_Lazycuts_interdiction_1;   // lazy cuts for s-clubs that form a star
 long num_Lazycuts_interdiction_2;	// lazy cuts for s-clubs with leavs
 long num_Lazycuts_interdiction_3;	// regular lazy cuts
 
-// the total time to solve the maximum s-club problem in all the iterations
+// total time to solve the maximum s-club problem in all the iterations
 double SclubTime = 0;   
 
 // count the number of iterations the solution is found by heuristics
