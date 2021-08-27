@@ -61,3 +61,7 @@ SOFTWARE.
 
 
 ### Acknowledgments
+
+We would like to thank Austin Buchanan and Hosseinali Salemi for providing
+us the codes used in [(Salemi and Buchanan 2020)] (http://www.optimization-online.org/DB_FILE/2017/09/6196.pdf) and freely offering their help
+to integrate it with our code. Their code in the original form is availble here.
