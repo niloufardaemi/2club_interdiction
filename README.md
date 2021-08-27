@@ -59,5 +59,5 @@ SOFTWARE.
 # Acknowledgments
 
 We would like to thank Austin Buchanan and Hosseinali Salemi for providing
-us the codes used in [Salemi and Buchanan 2020] (https://link.springer.com/article/10.1007/s12532-020-00175-6) and freely offering their help
-to integrate it with our code. All the files in our repository except main.cpp are part of therir codes with some modifications. Their code in the original form is availble here: https://github.com/halisalemi/ParsimoniousKClub
+us the codes used in [Salemi and Buchanan 2020](https://link.springer.com/article/10.1007/s12532-020-00175-6) and freely offering their help
+to integrate it with our code. All the files in our repository except main.cpp are part of therir codes with some modifications. Their code in the original form is availble [here](https://github.com/halisalemi/ParsimoniousKClub)
