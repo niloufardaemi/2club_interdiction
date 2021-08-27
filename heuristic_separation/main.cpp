@@ -90,6 +90,14 @@ protected:
 					chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_HS_sclub;  // duration of finding the heuristic s-club
 					SclubTime += duration_sclb.count();
 
+					// define requrired structures to add the lazy cut
+					GRBLinExpr cut_in_master = 0;
+					GRBLinExpr Star = 0;
+					GRBLinExpr Leaves = 0;
+					GRBLinExpr Critical_vertices = 0;
+					bool leaf = false;
+					bool lazycut_added = false;
+					
 					//  if heuristic approach finds the violation, add a lazy cut using the heuristic s-club:
 					if (THETA + 1.5 < HS.size())
 					{
@@ -103,14 +111,6 @@ protected:
 							HS_original_index.push_back(non_interdicted_vertices[HS[i]]);
 						}
 						KGraph induced_HS = graph_1.CreateInducedGraph(HS_original_index, ReverseMap);
-
-						// define requrired structures to add the lazy cut
-						GRBLinExpr cut_in_master = 0;
-						GRBLinExpr Star = 0;
-						GRBLinExpr Leaves = 0;
-						GRBLinExpr Critical_vertices = 0;
-						bool leaf = false;
-						bool lazycut_added = false;
 						
 						// add a lazy cut:
 						for (long i = 0; i < HS.size(); i++)
