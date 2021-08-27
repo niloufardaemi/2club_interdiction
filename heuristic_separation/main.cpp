@@ -270,16 +270,13 @@ protected:
 		{
 			cout << "Error during callback" << endl;
 		}
-
 	}     
-
 };
 
 
 
 int main(int argc, char *argv[])
 {
-
 	auto start = chrono::steady_clock::now();
 	if (argc < 2)
 		cerr << "ERROR: Not enough arguments.";
@@ -410,7 +407,6 @@ int main(int argc, char *argv[])
 	catch (GRBException e) {
 		cout << "Error code = " << e.getErrorCode() << endl;
 		cout << e.getMessage() << endl;
-
 	}
 	catch (...) {
 		cout << "Exception during optimization" << endl;
