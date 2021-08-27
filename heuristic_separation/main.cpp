@@ -177,7 +177,7 @@ protected:
 					}
 					
 					
-					//if heuristic approach does not the violation, call ICUT to find the maximum s-club:
+					//if heuristic approach does not find the violation, call ICUT to find the maximum s-club:
 					else  
 					{
 						auto start_sclub = chrono::steady_clock::now();   
@@ -187,17 +187,16 @@ protected:
 						chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_sclub;
 						SclubTime += duration_sclb.count();
 
-						// converting the index of vertices to the indices in the original graph (before interdiction)
-						vector<long> sclb_original_index;
-						for (int i = 0; i < sclb_index.size(); i++)
-						{
-							sclb_original_index.push_back(non_interdicted_vertices[sclb_index[i]]);
-						}
-						KGraph induced_kclb = graph_1.CreateInducedGraph(sclb_original_index, ReverseMap);
-
 						// add lazy cut if ICUT has found a violation
 						if (THETA < sclb_index.size())
 						{
+							// converting the index of vertices to the indices in the original graph (before interdiction)
+							vector<long> sclb_original_index;
+							for (int i = 0; i < sclb_index.size(); i++)
+							{
+								sclb_original_index.push_back(non_interdicted_vertices[sclb_index[i]]);
+							}
+							KGraph induced_kclb = graph_1.CreateInducedGraph(sclb_original_index, ReverseMap);
 							for (long i = 0; i < sclb_index.size(); i++)
 							{
 								if (lazycut_added == false)
