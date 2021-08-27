@@ -83,10 +83,8 @@ protected:
 				{
 					auto start_sclub = chrono::steady_clock::now();  // begin to compute the time for solving the separtion problem
 					
-					vector <long> HS;
-					vector <long> sclb_index;
-					HS = HeuristicAndPreprocess(induced_g, s);   // find the heuristic s-club in the interdicted graph
-					sclb_index = ICUT(induced_g, s, HS);         // find maximum s-club in the interdicted graph
+					vector <long> HS = HeuristicAndPreprocess(induced_g, s);   // find the heuristic s-club in the interdicted graph
+					vector <long> sclb_index = ICUT(induced_g, s, HS);         // find maximum s-club in the interdicted graph
 
 					chrono::duration <double> duration_sclb = chrono::steady_clock::now() - start_sclub; // duration of solving the separation
 					SclubTime += duration_sclb.count();   
