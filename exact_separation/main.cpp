@@ -78,7 +78,6 @@ protected:
 				vector<long> ReverseMap;
 				KGraph induced_g = graph_1.CreateInducedGraph(non_interdicted_vertices, ReverseMap);
 
-
 				// solve the separation only if the interdicted graph has at least 2 vertices
 				if (induced_g.n >= 2)
 				{
@@ -172,20 +171,10 @@ protected:
 							lazycut_added = true;
 						}
 					}
-				}
-				// reset the expressions and variables
-				Critical_vertices = 0;
-				Star = 0;
-				Leaves = 0;
-				leaf = false;
-				lazycut_added = false;
-				cut_in_master = 0;
-				non_interdicted_vertices.clear();
-				sclb_index.clear();
+				}				
 				delete[] x_master;
 			} 
 		}
-
 		catch (GRBException e)
 		{
 			cout << "Error number: " << e.getErrorCode() << endl;
@@ -195,16 +184,14 @@ protected:
 		{
 			cout << "Error during callback" << endl;
 		}
-
-	}   
-
+	}
 };  
+
 
 
 
 int main(int argc, char *argv[])
 {
-
 	auto start = chrono::steady_clock::now();
 	if (argc < 2)
 		cerr << "ERROR: Not enough arguments.";
@@ -321,8 +308,8 @@ int main(int argc, char *argv[])
 					num_interdicted_vertices++;
 				}
 			}
-			cout << "num_interdicted_vertices : " << num_interdicted_vertices << endl;  // number of interdicted vertices
-			cout << "theta : " << theta.get(GRB_DoubleAttr_X) << endl;   // size of the maximum s-club in the interdicted graph
+			cout << "num_interdicted_vertices : " << num_interdicted_vertices << endl;             // number of interdicted vertices
+			cout << "theta : " << theta.get(GRB_DoubleAttr_X) << endl;                             // size of the maximum s-club in the interdicted graph
 			cout << "# B&B nodes in interdiction = " << (long)model_Master.get(GRB_DoubleAttr_NodeCount) << endl;   // number of explored nodes
 			cout << "# of callbacks in interdiction  = " << num_callbacks_interdiction << endl;
 			cout << "# of lazy cuts in interdiction(Star) = " << num_Lazycuts_interdiction_1 << endl;
@@ -345,7 +332,7 @@ int main(int argc, char *argv[])
 	printf("Total Time : %.2fs\n", duration.count());
 
 	//print time to solve max sclub problem
-	printf("kclb Time : %.2fs\n", SclubTime);
+	printf("sclb Time : %.2fs\n", SclubTime);
 
 	return 0;
 }
